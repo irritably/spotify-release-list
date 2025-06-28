@@ -10,6 +10,7 @@ import SearchFilter from './SearchFilter'
 import VariousArtistsFilter from './VariousArtistsFilter'
 import DuplicatesFilter from './DuplicatesFilter'
 import RemixesFilter from './RemixesFilter'
+import TracksFilter from './TracksFilter'
 
 /**
  * Render filters
@@ -32,6 +33,7 @@ function Filters() {
       <SearchFilter />
       <DateRangeFilter />
       <AlbumGroupsFilter />
+      <TracksFilter />
       <VariousArtistsFilter />
       <RemixesFilter />
       <DuplicatesFilter />

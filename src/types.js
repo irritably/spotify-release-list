@@ -84,6 +84,8 @@
  *   excludeDuplicates: boolean
  *   favoritesOnly: boolean
  *   newOnly: boolean
+ *   minTracks?: number
+ *   maxTracks?: number
  * }} Filters
  *
  * @typedef {{

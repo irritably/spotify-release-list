@@ -166,6 +166,8 @@ export const getFiltersFavoritesOnly = createSelector(
   (filters) => filters.favoritesOnly
 )
 export const getFiltersNewOnly = createSelector(getFilters, (filters) => filters.newOnly)
+export const getFiltersMinTracks = createSelector(getFilters, (filters) => filters.minTracks)
+export const getFiltersMaxTracks = createSelector(getFilters, (filters) => filters.maxTracks)
 
 /**
  * Get relevant app data.
@@ -206,7 +208,12 @@ export const getFiltersApplied = createSelector(
   getFiltersExcludeDuplicates,
   getFiltersFavoritesOnly,
   getFiltersNewOnly,
-  (groups, ...rest) => Boolean(groups.length) || includesTruthy(rest)
+  getFiltersMinTracks,
+  getFiltersMaxTracks,
+  (groups, search, startDate, endDate, excludeVA, excludeRemixes, excludeDuplicates, favoritesOnly, newOnly, minTracks, maxTracks) => 
+    Boolean(groups.length) || Boolean(search) || Boolean(startDate) || Boolean(endDate) || 
+    excludeVA || excludeRemixes || excludeDuplicates || favoritesOnly || newOnly || 
+    Boolean(minTracks) || Boolean(maxTracks)
 )
 
 /**
@@ -332,7 +339,7 @@ const getNonRemixAlbumIds = createSelector(getAlbumsArray, (albums) =>
  * Get album IDs with duplicates removed
  */
 const getNoDuplicatesAlbumIds = createSelector(getOriginalReleases, (releases) => {
-  const charsMap = { '[': '(', ']': ')', '’': "'" }
+  const charsMap = { '[': '(', ']': ')', ''': "'" }
   const escapedChars = escapeRegExp(Object.keys(charsMap).join(''))
   const charsRegex = new RegExp(`[${escapedChars}]`, 'g')
 
@@ -365,6 +372,28 @@ const getFavoriteAlbumIds = createSelector(getFavorites, (favorites) =>
  */
 const getNewAlbumIds = createSelector(getAlbumsArray, (albums) =>
   albums.filter((album) => albumsNew.has(album.id)).map((album) => album.id)
+)
+
+/**
+ * Get album IDs based on track count filter
+ */
+const getTracksFiltered = createSelector(
+  [getFiltersMinTracks, getFiltersMaxTracks, getAlbumsArray],
+  (minTracks, maxTracks, albums) => {
+    if (!minTracks && !maxTracks) return null
+    
+    return albums.reduce((ids, album) => {
+      const trackCount = album.totalTracks
+      const meetsMin = !minTracks || trackCount >= minTracks
+      const meetsMax = !maxTracks || trackCount <= maxTracks
+      
+      if (meetsMin && meetsMax) {
+        ids.push(album.id)
+      }
+      
+      return ids
+    }, /** @type {string[]} */ ([]))
+  }
 )
 
 /**
@@ -446,6 +475,7 @@ export const getFilteredAlbumsArray = createSelector(
   getDuplicatesFiltered,
   getFavoritesFiltered,
   getNewFiltered,
+  getTracksFiltered,
   (albums, ...filtered) => intersect(filtered.filter(Array.isArray)).map((id) => albums[id])
 )
 

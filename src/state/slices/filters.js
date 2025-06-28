@@ -13,6 +13,8 @@ export const initialState = {
     excludeDuplicates: false,
     favoritesOnly: false,
     newOnly: false,
+    minTracks: null,
+    maxTracks: null,
   },
 }
 
